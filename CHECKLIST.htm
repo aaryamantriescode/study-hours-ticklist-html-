@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Break Checklist with Timer</title>
+    <style>
+        body {
+    		font-family: Arial, sans-serif;
+    		background-image: url("****PUT ANY PHOTO URL HERE****");
+    		background-size: contain; /* Adjust as needed */
+    		background-position: center; /* Center the image */
+    		background-repeat: no-repeat;
+	}
+
+
+        label {
+            display: block;
+            margin-bottom: 27px;
+        }
+
+        #timer {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Work Break Checklist with Timer</h1>
+
+    <form id="workBreakForm">
+        <!-- Add checkboxes for all study sessions and breaks -->
+        <label>
+            <input type="checkbox" name="session1"> Work Session 1 (1 hour)
+        </label>
+	<label>
+            <input type="checkbox" name="session2"> Work Session 2 (1 hour)
+        </label>
+        
+        <label>
+            <input type="checkbox" name="session3"> Work Session 3 (1 hour)
+        </label>
+        
+        <label>
+            <input type="checkbox" name="session4"> Work Session 4 (1 hour)
+        </label>
+        
+        <label>
+            <input type="checkbox" name="session5"> Work Session 5 (1 hour)
+        </label>
+        
+        <label>
+            <input type="checkbox" name="session6"> Work Session 6 (1 hour)
+        </label>
+       
+        <label>
+            <input type="checkbox" name="session7"> Work Session 7 (1 hour)
+        </label>
+       
+        <label>
+            <input type="checkbox" name="session8"> Work Session 8 (1 hour)
+        </label>
+        
+        <label>
+            <input type="checkbox" name="session9"> Work Session 9 (1 hour)
+        </label>
+        
+
+
+        <label>
+            <input type="checkbox" name="session10"> Work Session 10 (1 hour)
+        </label>
+
+        <div id="timer">Timer will appear here</div>
+
+        <!-- Buttons to control the timer -->
+        <button type="button" onclick="startWorkSessionTimer()">Start Work Session Timer</button>
+        <button type="button" onclick="startBreakTimer()">Start Break Timer</button>
+        <button type="button" onclick="stopTimer()">Stop Timer</button>
+        <button type="button" onclick="resetTimer()">Reset Timer</button>
+        <button type="reset" onclick="resetChecklist()">Reset Checklist</button>
+    </form>
+
+    <!-- Audio element for the sound -->
+    <audio id="timerSound">
+        <source src="C:\Users\aarya\Downloads\clock-alarm-8761.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        let timerInterval;
+        let targetTime;
+        let isTimerRunning = false;
+
+        function saveChecklist() {
+            const form = document.getElementById('workBreakForm');
+            const inputs = form.querySelectorAll('input[type="checkbox"]');
+
+            inputs.forEach(input => {
+                localStorage.setItem(input.name, input.checked);
+            });
+        }
+
+        function loadChecklist() {
+            const form = document.getElementById('workBreakForm');
+            const inputs = form.querySelectorAll('input[type="checkbox"]');
+
+            inputs.forEach(input => {
+                const savedValue = localStorage.getItem(input.name);
+                if (savedValue !== null) {
+                    input.checked = JSON.parse(savedValue);
+                }
+            });
+        }
+
+        function startWorkSessionTimer() {
+            if (!isTimerRunning) {
+                const timerDisplay = document.getElementById('timer');
+                targetTime = new Date().getTime() + (60 * 60 * 1000); // 1 hour in milliseconds
+                startTimer(timerDisplay);
+            }
+        }
+
+        function startBreakTimer() {
+            if (!isTimerRunning) {
+                const timerDisplay = document.getElementById('timer');
+                targetTime = new Date().getTime() + (2.5 * 60 * 1000); // 5 minutes in milliseconds
+                startTimer(timerDisplay);
+            }
+        }
+
+        function startTimer(display) {
+            isTimerRunning = true;
+            timerInterval = setInterval(function () {
+                const currentTime = new Date().getTime();
+                const timeRemaining = targetTime - currentTime;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    display.textContent = 'Timer Expired!';
+                    playTimerSound(); // Play sound when the timer expires
+                } else {
+                    const minutes = Math.floor(timeRemaining / (1000 * 60));
+                    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                    display.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            document.getElementById('timer').textContent = 'Timer will appear here';
+        }
+
+        function resetChecklist() {
+            localStorage.clear();
+            loadChecklist();
+            resetTimer();
+        }
+
+        function playTimerSound() {
+            const audio = document.getElementById('timerSound');
+            audio.play();
+        }
+
+        window.onload = function () {
+            loadChecklist();
+        };
+
+        window.onbeforeunload = function () {
+            saveChecklist();
+        };
+    </script>
+
+</body>
+</html>
